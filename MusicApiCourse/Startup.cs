@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MusicApiCourse.Data;
 
 namespace MusicApiCourse
 {
@@ -32,6 +34,7 @@ namespace MusicApiCourse
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MusicApiCourse", Version = "v1" });
             });
+            services.AddDbContext<ApiDbContext>(option => option.UseSqlServer());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
