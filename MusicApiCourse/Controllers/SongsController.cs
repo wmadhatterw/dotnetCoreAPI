@@ -5,6 +5,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using MusicApiCourse.Data;
 using MusicApiCourse.Models;
 
@@ -25,10 +26,10 @@ namespace MusicApiCourse.Controllers
 
         // GET: api/<SongsController>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             //return _dbContext.Songs;
-            return Ok(_dbContext.Songs); // 200 Response
+            return Ok(await _dbContext.Songs.ToListAsync()); // 200 Response
             //return BadRequest(); // 400 Bad Request
             //return NotFound(); // 404 Not Found
             //return StatusCode(StatusCodes.Status403Forbidden);
@@ -37,9 +38,9 @@ namespace MusicApiCourse.Controllers
 
         // GET api/<SongsController>/5
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var song = _dbContext.Songs.Find(id);
+            var song = await _dbContext.Songs.FindAsync(id);
             if (song == null)
             {
                 return NotFound("No Record Found for this Id");
@@ -51,18 +52,18 @@ namespace MusicApiCourse.Controllers
 
         // POST api/<SongsController>
         [HttpPost]
-        public IActionResult Post([FromBody] Song song)
+        public async Task<IActionResult> Post([FromBody] Song song)
         {
-            _dbContext.Songs.Add(song);
-            _dbContext.SaveChanges();
+           await _dbContext.Songs.AddAsync(song);
+           await _dbContext.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created);
         }
 
         // PUT api/<SongsController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Song songObj)
+        public async Task<IActionResult> Put(int id, [FromBody] Song songObj)
         {
-            var song = _dbContext.Songs.Find(id);
+            var song = await _dbContext.Songs.FindAsync(id);
             if (song == null)
             {
                 return NotFound("Record Not Found for this Id");
@@ -71,7 +72,7 @@ namespace MusicApiCourse.Controllers
             {
                 song.Title = songObj.Title;
                 song.Language = songObj.Language;
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
                 return Ok("Record Updated Successfully");
             }
 
@@ -79,9 +80,9 @@ namespace MusicApiCourse.Controllers
 
         // DELETE api/<SongsController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var song = _dbContext.Songs.Find(id);
+            var song = await _dbContext.Songs.FindAsync(id);
             if (song == null)
             {
                 return NotFound("Record Not Found for this Id");
@@ -89,7 +90,7 @@ namespace MusicApiCourse.Controllers
             else
             {
                 _dbContext.Songs.Remove(song);
-                _dbContext.SaveChanges();
+                await _dbContext.SaveChangesAsync();
                 return Ok("Record Deleted");
             }
         }
