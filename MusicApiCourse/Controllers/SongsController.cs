@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using MusicApiCourse.Data;
 using MusicApiCourse.Models;
 
@@ -20,46 +22,76 @@ namespace MusicApiCourse.Controllers
         {
             _dbContext = dbContext;
         }
+
         // GET: api/<SongsController>
         [HttpGet]
-        public IEnumerable<Song> Get()
+        public IActionResult Get()
         {
-            return _dbContext.Songs;
+            //return _dbContext.Songs;
+            return Ok(_dbContext.Songs); // 200 Response
+            //return BadRequest(); // 400 Bad Request
+            //return NotFound(); // 404 Not Found
+            //return StatusCode(StatusCodes.Status403Forbidden);
         }
+
 
         // GET api/<SongsController>/5
         [HttpGet("{id}")]
-        public Song Get(int id)
+        public IActionResult Get(int id)
         {
             var song = _dbContext.Songs.Find(id);
-            return song;
+            if (song == null)
+            {
+                return NotFound("No Record Found for this Id");
+            }
+            else
+                return Ok(song);
+
         }
 
         // POST api/<SongsController>
         [HttpPost]
-        public void Post([FromBody] Song song)
+        public IActionResult Post([FromBody] Song song)
         {
             _dbContext.Songs.Add(song);
             _dbContext.SaveChanges();
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         // PUT api/<SongsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Song songObj)
+        public IActionResult Put(int id, [FromBody] Song songObj)
         {
             var song = _dbContext.Songs.Find(id);
-            song.Title = songObj.Title;
-            song.Language = songObj.Language;
-            _dbContext.SaveChanges();
+            if (song == null)
+            {
+                return NotFound("Record Not Found for this Id");
+            }
+            else
+            {
+                song.Title = songObj.Title;
+                song.Language = songObj.Language;
+                _dbContext.SaveChanges();
+                return Ok("Record Updated Successfully");
+            }
+
         }
 
         // DELETE api/<SongsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
             var song = _dbContext.Songs.Find(id);
-            _dbContext.Songs.Remove(song);
-            _dbContext.SaveChanges();
+            if (song == null)
+            {
+                return NotFound("Record Not Found for this Id");
+            }
+            else
+            {
+                _dbContext.Songs.Remove(song);
+                _dbContext.SaveChanges();
+                return Ok("Record Deleted");
+            }
         }
     }
 }
