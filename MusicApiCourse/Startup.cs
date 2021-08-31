@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MusicApiCourse.Data;
 
 namespace MusicApiCourse
 {
@@ -32,10 +34,11 @@ namespace MusicApiCourse
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MusicApiCourse", Version = "v1" });
             });
+            services.AddDbContext<ApiDbContext>(option => option.UseSqlServer(@"Data Source=(LocalDB)\mssqllocaldb;Initial Catalog=MusicDb"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApiDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -43,6 +46,8 @@ namespace MusicApiCourse
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MusicApiCourse v1"));
             }
+
+            dbContext.Database.EnsureCreated();
 
             app.UseHttpsRedirection();
 
